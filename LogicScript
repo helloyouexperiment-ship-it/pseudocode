@@ -1,0 +1,90 @@
+You're describing the concept of **pseudocode**. It's not a real, executable programming language but a "universal language" for programmers to outline a program's logic before writing it in a specific syntax like Python or Java.
+
+Since syntax isn't important, the focus is on a few key building blocks that all programming languages share. Let's call your language **LogicScript**.
+
+
+### The Core Concepts of LogicScript
+
+LogicScript (and all coding) is built on just a few simple ideas:
+
+1. **Variables:** These are boxes where you store information. You give each box a name.
+    - `SET my_name = "Ryan"`
+    - `SET user_age = 30`
+2. **Conditionals (If/Then/Else):** This is how you make decisions. It's the most important concept.
+    - `IF user_age > 18 THEN`
+    - `PRINT "You are an adult."`
+    - `ELSE`
+    - `PRINT "You are a minor."`
+    - `END IF`
+3. **Loops (Iteration):** This is how you do something multiple times. The most common type is looping through a list of items.
+    - `SET shopping_list = ["Apples", "Milk", "Bread"]`
+    - `FOR EACH item IN shopping_list:`
+    - `PRINT "Don't forget to buy: " + item`
+    - `END LOOP`
+4. **Functions (Procedures):** These are reusable blocks of code. You package logic inside a function and give it a name. This keeps your code clean and organized.
+    - `FUNCTION calculate_tax(price):`
+    - `SET tax_amount = price * 0.07`
+    - `RETURN tax_amount`
+    - `END FUNCTION`
+
+---
+
+### 🛒 LogicScript Example: The Smart Shopping Cart
+
+Here is a complete program written in LogicScript. The goal is to calculate the total price of a shopping cart, applying a discount only to expensive items.
+
+This example uses all the concepts above.
+
+`// Define a function for calculating a special discount.
+// We'll use this multiple times.
+FUNCTION calculate_discount(item_price):
+    // Use a conditional to make a decision
+    IF item_price > 50 THEN
+        // This item is expensive, give a 10% discount
+        SET discount = item_price * 0.10
+        PRINT "Applying a $10% discount!"
+        RETURN discount
+    ELSE
+        // Not expensive, no discount
+        RETURN 0
+    END IF
+END FUNCTION
+
+// ----------------------------------------------------
+// MAIN PROGRAM STARTS HERE
+// ----------------------------------------------------
+
+// 1. Set up our variables (the data)
+SET shopping_cart = [
+    {name: "T-Shirt", price: 25},
+    {name: "Jeans", price: 45},
+    {name: "Leather Jacket", price: 150}
+]
+
+SET grand_total = 0
+
+PRINT "Welcome to the store. Checking your cart..."
+
+// 2. Use a loop to check every item
+FOR EACH item IN shopping_cart:
+    PRINT "---"
+    PRINT "Checking item: " + item.name
+    PRINT "Base price: $" + item.price
+
+    // 3. Use our function to see if a discount applies
+    SET item_discount = calculate_discount(item.price)
+    
+    // 4. Calculate the final price for this item
+    SET final_item_price = item.price - item_discount
+    PRINT "Final item price: $" + final_item_price
+
+    // 5. Add this item's final price to the grand total
+    SET grand_total = grand_total + final_item_price
+END LOOP
+
+// 6. Print the final results
+PRINT "========================="
+PRINT "All items processed."
+PRINT "Your final grand total is: $" + grand_total`
+
+As you can see, anyone can read this and understand the **logic** without needing to know any specific programming syntax.
