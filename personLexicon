@@ -1,0 +1,180 @@
+// DATA STRUCTURES
+STRUCT TermDefinition:
+    term: STRING
+    meaning: STRING
+    example_usage: LIST of STRING
+    notes: STRING
+    last_updated: DATETIME
+
+STRUCT PersonLexicon:
+    person_name: STRING
+    definitions: MAP<STRING, TermDefinition>   // key = term in LOWERCASE
+
+// GLOBAL STORE (could be a database in a real system)
+GLOBAL lexicons: MAP<STRING, PersonLexicon>    // key = person_name
+
+
+// CORE FUNCTIONS
+
+FUNCTION get_or_create_lexicon(person_name: STRING) -> PersonLexicon:
+    IF person_name IN lexicons:
+        RETURN lexicons[person_name]
+    ELSE:
+        NEW lexicon = PersonLexicon()
+        lexicon.person_name = person_name
+        lexicon.definitions = EMPTY MAP
+        lexicons[person_name] = lexicon
+        RETURN lexicon
+
+
+FUNCTION define_term_for_person(
+    person_name: STRING,
+    term: STRING,
+    meaning: STRING,
+    example_usage: LIST of STRING,
+    notes: STRING
+):
+    lexicon = get_or_create_lexicon(person_name)
+    key = LOWERCASE(term)
+
+    NEW def = TermDefinition()
+    def.term = term
+    def.meaning = meaning
+    def.example_usage = example_usage
+    def.notes = notes
+    def.last_updated = NOW()
+
+    lexicon.definitions[key] = def
+
+
+FUNCTION update_term_meaning(
+    person_name: STRING,
+    term: STRING,
+    new_meaning: STRING,
+    new_example_usage: LIST of STRING,
+    new_notes: STRING
+):
+    lexicon = get_or_create_lexicon(person_name)
+    key = LOWERCASE(term)
+
+    IF key NOT IN lexicon.definitions:
+        // If term doesn't exist, define it instead
+        CALL define_term_for_person(person_name, term, new_meaning, new_example_usage, new_notes)
+        RETURN
+
+    def = lexicon.definitions[key]
+    def.meaning = new_meaning
+    IF new_example_usage IS NOT EMPTY:
+        def.example_usage = new_example_usage
+    IF new_notes IS NOT EMPTY:
+        def.notes = new_notes
+    def.last_updated = NOW()
+
+
+FUNCTION get_term_definition(person_name: STRING, term: STRING) -> TermDefinition OR NULL:
+    lexicon = get_or_create_lexicon(person_name)
+    key = LOWERCASE(term)
+
+    IF key IN lexicon.definitions:
+        RETURN lexicon.definitions[key]
+    ELSE:
+        RETURN NULL
+
+
+// COMMUNICATION SUPPORT
+
+FUNCTION interpret_message(person_name: STRING, message: STRING) -> STRING:
+    /*
+        Goal: Replace or annotate terms in the message with that person's definitions.
+        This is very high-level pseudocode, not real NLP.
+    */
+
+    lexicon = get_or_create_lexicon(person_name)
+    words = SPLIT(message, " ")
+    interpreted_words = EMPTY LIST
+
+    FOR EACH word IN words:
+        clean_word = STRIP_PUNCTUATION(LOWERCASE(word))
+        IF clean_word IN lexicon.definitions:
+            def = lexicon.definitions[clean_word]
+            annotated = word + " [means: " + def.meaning + "]"
+            APPEND annotated TO interpreted_words
+        ELSE:
+            APPEND word TO interpreted_words
+
+    interpreted_message = JOIN(interpreted_words, " ")
+    RETURN interpreted_message
+
+
+FUNCTION detect_unknown_terms(person_name: STRING, message: STRING) -> LIST of STRING:
+    /*
+        Find words that might need definitions based on this person's lexicon.
+    */
+
+    lexicon = get_or_create_lexicon(person_name)
+    words = UNIQUE(SPLIT(message, " "))
+    unknown_terms = EMPTY LIST
+
+    FOR EACH word IN words:
+        clean_word = STRIP_PUNCTUATION(LOWERCASE(word))
+        IF clean_word NOT IN lexicon.definitions AND IS_POTENTIALLY_MEANINGFUL(clean_word):
+            APPEND clean_word TO unknown_terms
+
+    RETURN unknown_terms
+
+
+// INTERACTIVE WORKFLOW EXAMPLE
+
+PROCEDURE conversation_loop(person_name: STRING):
+    PRINT("Starting conversation with " + person_name)
+
+    LOOP FOREVER:
+        INPUT user_message
+        IF user_message == "QUIT":
+            BREAK
+
+        unknown_terms = detect_unknown_terms(person_name, user_message)
+
+        // Ask for definitions of unknown terms
+        FOR EACH term IN unknown_terms:
+            PRINT("You used the term: '" + term + "'. What does this mean for you?")
+            INPUT meaning
+            PRINT("Can you give an example of how you use '" + term + "' in a sentence?")
+            INPUT example
+            PRINT("Any extra notes about this term? (Press enter to skip)")
+            INPUT notes
+
+            CALL define_term_for_person(
+                person_name,
+                term,
+                meaning,
+                [example],
+                notes
+            )
+
+        interpreted = interpret_message(person_name, user_message)
+        PRINT("Interpreted (using your definitions):")
+        PRINT(interpreted)
+
+        // (Here, the system or another person could respond, now that terms are clearer)
+
+
+// OPTIONAL: EXPORT A "DEFINITIONS SHEET"
+
+FUNCTION export_definitions(person_name: STRING) -> LIST of STRING:
+    /*
+        Returns a list of human-readable definition lines for that person.
+    */
+
+    lexicon = get_or_create_lexicon(person_name)
+    lines = EMPTY LIST
+
+    FOR EACH key, def IN lexicon.definitions:
+        line = def.term + ": " + def.meaning
+        IF def.example_usage NOT EMPTY:
+            line = line + " | Example: " + def.example_usage[0]
+        IF def.notes NOT EMPTY:
+            line = line + " | Notes: " + def.notes
+        APPEND line TO lines
+
+    RETURN lines
