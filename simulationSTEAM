@@ -1,0 +1,122 @@
+PROGRAM simulation
+  // Purpose: Define the terms "fear", "simulation", "dream", and "mental illness"
+  // and display them in a clean, structured format.
+
+  TYPE Definition IS RECORD
+    term: STRING
+    part_of_speech: STRING
+    short_def: STRING
+    traits: LIST<STRING>        // key characteristics
+    notes: LIST<STRING>         // caveats/context
+    example: STRING             // optional illustrative line
+  END RECORD
+
+  DECLARE definitions AS MAP<STRING, Definition>
+
+  PROCEDURE define_word(
+      term: STRING,
+      part_of_speech: STRING,
+      short_def: STRING,
+      traits: LIST<STRING>,
+      notes: LIST<STRING>,
+      example: STRING
+  )
+    DECLARE d AS Definition
+    d.term = term
+    d.part_of_speech = part_of_speech
+    d.short_def = short_def
+    d.traits = traits
+    d.notes = notes
+    d.example = example
+    definitions[LOWER(term)] = d
+  END PROCEDURE
+
+  PROCEDURE print_definition(d: Definition)
+    PRINT "— " + d.term + " (" + d.part_of_speech + ")"
+    PRINT "  Definition: " + d.short_def
+    IF LENGTH(d.traits) > 0 THEN
+      PRINT "  Traits:"
+      FOR t IN d.traits DO
+        PRINT "    • " + t
+      END FOR
+    END IF
+    IF LENGTH(d.notes) > 0 THEN
+      PRINT "  Notes:"
+      FOR n IN d.notes DO
+        PRINT "    • " + n
+      END FOR
+    END IF
+    IF d.example != "" THEN
+      PRINT "  Example: " + d.example
+    END IF
+    PRINT "" // blank line
+  END PROCEDURE
+
+  PROCEDURE main()
+    // ---- Definitions ----
+    CALL define_word(
+      term = "fear",
+      part_of_speech = "noun",
+      short_def = "An adaptive emotional and physiological response to a perceived threat.",
+      traits = [
+        "Involves appraisal of danger, arousal (e.g., heart rate), and readiness to act",
+        "Helpful short-term; persistent or disproportionate fear trends toward anxiety"
+      ],
+      notes = [
+        "Shaped by context, learning, and biology"
+      ],
+      example = "A sudden bark in the dark triggers fear and a step back."
+    )
+
+    CALL define_word(
+      term = "simulation",
+      part_of_speech = "noun",
+      short_def = "A constructed model or process that imitates a system to study or experience it.",
+      traits = [
+        "Has rules, inputs, state, and outputs",
+        "Can be conceptual, computational, or physical"
+      ],
+      notes = [
+        "Used for prediction, training, or exploration; fidelity varies with purpose"
+      ],
+      example = "A flight simulator reproduces cockpit conditions for practice."
+    )
+
+    CALL define_word(
+      term = "dream",
+      part_of_speech = "noun",
+      short_def = "A sequence of perceptions, thoughts, and emotions occurring during sleep.",
+      traits = [
+        "Often vivid, symbolic, and emotionally intense",
+        "Common in REM sleep; can also occur in non-REM"
+      ],
+      notes = [
+        "Content is reconstructed on waking and may be fragmented"
+      ],
+      example = "I dreamed the hallway bent like a river and I could float."
+    )
+
+    CALL define_word(
+      term = "mental illness",
+      part_of_speech = "noun (collective)",
+      short_def = "A clinically significant disturbance in cognition, emotion, or behavior causing distress or functional impairment.",
+      traits = [
+        "Includes conditions such as depressive, anxiety, bipolar, and psychotic disorders",
+        "Assessed and treated by qualified professionals"
+      ],
+      notes = [
+        "Etiology is multifactorial (biological, psychological, social)",
+        "Treatment may include therapy, medication, skills training, and support"
+      ],
+      example = "Persistent low mood and loss of interest that impair daily life can indicate depression."
+    )
+
+    // ---- Output ----
+    FOR key IN ["fear", "simulation", "dream", "mental illness"] DO
+      CALL print_definition(definitions[key])
+    END FOR
+  END PROCEDURE
+
+  // Entry point
+  CALL main()
+END PROGRAM
