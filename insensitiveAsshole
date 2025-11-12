@@ -1,0 +1,432 @@
+# insensitive_asshole.py
+# Pseudocode for real-time empathetic communication optimization
+
+from dataclasses import dataclass
+from typing import List, Dict, Tuple, Optional
+from enum import Enum
+
+
+class SensoryChannel(Enum):
+    VISUAL = "sight"
+    AUDITORY = "sound"
+    TACTILE = "touch"
+    OLFACTORY = "smell"
+    GUSTATORY = "taste"
+
+
+class EmotionalValence(Enum):
+    POSITIVE = 1
+    NEUTRAL = 0
+    NEGATIVE = -1
+
+
+@dataclass
+class SensoryInput:
+    channel: SensoryChannel
+    raw_data: any
+    intensity: float  # 0.0 to 1.0
+    timestamp: float
+
+
+@dataclass
+class SyntheticEmotion:
+    primary_emotion: str  # anger, fear, joy, sadness, disgust, surprise, trust
+    intensity: float
+    confidence: float  # how sure we are about this reading
+    contributing_signals: List[SensoryChannel]
+
+
+@dataclass
+class FuturePath:
+    response_option: str
+    emotional_connection_delta: float  # positive = strengthens, negative = weakens
+    conflict_probability: float  # 0.0 to 1.0
+    reproductive_fitness_score: float  # combining emotional + biological factors
+
+
+@dataclass
+class PastEvent:
+    context_signature: str  # compressed representation of similar situation
+    response_used: str
+    outcome_quality: float  # -1.0 to 1.0
+    lessons_learned: List[str]
+
+
+class InsensitiveAssholeOptimizer:
+    """
+    The algorithm that prevents you from being an insensitive asshole.
+    Processes multi-sensory input → emotional inference → futures modeling → memory → response
+    """
+    
+    def __init__(self):
+        self.sensory_buffer = []
+        self.emotional_history = []
+        self.memory_bank = []
+        self.current_context_window = 30  # seconds of relevant history
+        
+    
+    def import_sensory_inputs(self, environment) -> List[SensoryInput]:
+        """
+        Capture all available sensory data from the interaction.
+        The more channels, the richer the understanding.
+        """
+        inputs = []
+        
+        # VISUAL: facial expressions, body language, micro-expressions
+        visual = SensoryInput(
+            channel=SensoryChannel.VISUAL,
+            raw_data={
+                'facial_tension': environment.detect_muscle_patterns(),
+                'eye_contact': environment.measure_gaze_direction(),
+                'posture': environment.analyze_body_orientation(),
+                'micro_expressions': environment.capture_fleeting_emotions(),
+                'proximity': environment.measure_distance(),
+            },
+            intensity=environment.calculate_visual_salience(),
+            timestamp=environment.now()
+        )
+        inputs.append(visual)
+        
+        # AUDITORY: tone, pitch, cadence, volume, pauses
+        auditory = SensoryInput(
+            channel=SensoryChannel.AUDITORY,
+            raw_data={
+                'vocal_tone': environment.analyze_pitch_and_timbre(),
+                'speech_rate': environment.measure_words_per_minute(),
+                'volume': environment.measure_decibels(),
+                'pauses': environment.detect_silence_patterns(),
+                'word_choice': environment.extract_semantic_content(),
+                'voice_tremor': environment.detect_vocal_instability(),
+            },
+            intensity=environment.calculate_auditory_prominence(),
+            timestamp=environment.now()
+        )
+        inputs.append(auditory)
+        
+        # TACTILE: physical contact, tension, temperature
+        if environment.physical_contact_occurring():
+            tactile = SensoryInput(
+                channel=SensoryChannel.TACTILE,
+                raw_data={
+                    'touch_pressure': environment.measure_contact_force(),
+                    'skin_temperature': environment.sense_thermal_radiation(),
+                    'muscle_tension': environment.detect_rigidity(),
+                },
+                intensity=environment.calculate_tactile_significance(),
+                timestamp=environment.now()
+            )
+            inputs.append(tactile)
+        
+        # OLFACTORY: stress pheromones, environmental scents
+        olfactory = SensoryInput(
+            channel=SensoryChannel.OLFACTORY,
+            raw_data={
+                'stress_markers': environment.detect_chemical_signals(),
+                'ambient_context': environment.analyze_environmental_scents(),
+            },
+            intensity=environment.calculate_olfactory_impact(),
+            timestamp=environment.now()
+        )
+        inputs.append(olfactory)
+        
+        return inputs
+    
+    
+    def synthesize_emotions(self, sensory_inputs: List[SensoryInput]) -> List[SyntheticEmotion]:
+        """
+        Transform raw sensory data into probable emotional states.
+        This is where pattern recognition meets theory of mind.
+        """
+        emotions = []
+        
+        # Cross-modal integration: combine signals across senses
+        integrated_signal = self._cross_modal_fusion(sensory_inputs)
+        
+        # Map to primary emotional dimensions
+        emotion_space = {
+            'anger': self._compute_anger_likelihood(integrated_signal),
+            'fear': self._compute_fear_likelihood(integrated_signal),
+            'joy': self._compute_joy_likelihood(integrated_signal),
+            'sadness': self._compute_sadness_likelihood(integrated_signal),
+            'disgust': self._compute_disgust_likelihood(integrated_signal),
+            'surprise': self._compute_surprise_likelihood(integrated_signal),
+            'trust': self._compute_trust_likelihood(integrated_signal),
+        }
+        
+        # Identify dominant and secondary emotions
+        for emotion_name, (intensity, confidence, channels) in emotion_space.items():
+            if intensity > 0.2:  # threshold for significance
+                emotions.append(SyntheticEmotion(
+                    primary_emotion=emotion_name,
+                    intensity=intensity,
+                    confidence=confidence,
+                    contributing_signals=channels
+                ))
+        
+        # Detect mixed emotional states (crucial for nuance)
+        if self._detecting_ambivalence(emotions):
+            emotions.append(self._synthesize_ambivalence(emotions))
+        
+        return sorted(emotions, key=lambda e: e.intensity * e.confidence, reverse=True)
+    
+    
+    def project_futures(self, 
+                       current_emotions: List[SyntheticEmotion],
+                       response_candidates: List[str]) -> List[FuturePath]:
+        """
+        Simulate how each possible response will affect the relationship.
+        This is your "asshole prevention" layer.
+        """
+        futures = []
+        
+        for response in response_candidates:
+            # Model emotional trajectory
+            emotional_delta = self._predict_emotional_impact(
+                current_state=current_emotions,
+                proposed_response=response
+            )
+            
+            # Calculate conflict probability
+            conflict_risk = self._estimate_conflict_probability(
+                current_emotions=current_emotions,
+                response=response,
+                emotional_delta=emotional_delta
+            )
+            
+            # Assess reproductive fitness (both emotional intimacy + biological)
+            fitness = self._calculate_reproductive_fitness(
+                emotional_connection_change=emotional_delta,
+                conflict_risk=conflict_risk,
+                response_authenticity=self._measure_authenticity(response)
+            )
+            
+            futures.append(FuturePath(
+                response_option=response,
+                emotional_connection_delta=emotional_delta,
+                conflict_probability=conflict_risk,
+                reproductive_fitness_score=fitness
+            ))
+        
+        return sorted(futures, key=lambda f: f.reproductive_fitness_score, reverse=True)
+    
+    
+    def query_memory(self, current_context: Dict) -> List[PastEvent]:
+        """
+        Find similar past situations and extract learned patterns.
+        Your experience is your guide.
+        """
+        # Generate context signature for current situation
+        current_signature = self._compress_context_to_signature(current_context)
+        
+        # Semantic search through memory bank
+        similar_events = []
+        for past_event in self.memory_bank:
+            similarity = self._calculate_context_similarity(
+                current_signature,
+                past_event.context_signature
+            )
+            
+            if similarity > 0.7:  # threshold for relevance
+                similar_events.append((past_event, similarity))
+        
+        # Sort by similarity and outcome quality
+        similar_events.sort(
+            key=lambda x: x[1] * max(0, x[0].outcome_quality),  # prefer good outcomes
+            reverse=True
+        )
+        
+        return [event for event, _ in similar_events[:5]]  # top 5 most relevant
+    
+    
+    def optimize_response(self, 
+                         current_emotions: List[SyntheticEmotion],
+                         projected_futures: List[FuturePath],
+                         relevant_memories: List[PastEvent]) -> str:
+        """
+        The final synthesis: choose the response that maximizes connection
+        while minimizing asshole behavior.
+        """
+        # Weight factors for decision
+        weights = {
+            'emotional_connection': 0.4,
+            'conflict_avoidance': 0.3,
+            'past_lessons': 0.2,
+            'authenticity': 0.1,
+        }
+        
+        best_response = None
+        best_score = -float('inf')
+        
+        for future in projected_futures:
+            # Factor 1: Emotional connection improvement
+            connection_score = future.emotional_connection_delta * weights['emotional_connection']
+            
+            # Factor 2: Conflict avoidance
+            conflict_score = (1 - future.conflict_probability) * weights['conflict_avoidance']
+            
+            # Factor 3: Lessons from memory
+            memory_score = self._evaluate_against_memories(
+                future.response_option,
+                relevant_memories
+            ) * weights['past_lessons']
+            
+            # Factor 4: Authenticity (don't be fake)
+            authenticity_score = self._measure_authenticity(
+                future.response_option
+            ) * weights['authenticity']
+            
+            total_score = connection_score + conflict_score + memory_score + authenticity_score
+            
+            if total_score > best_score:
+                best_score = total_score
+                best_response = future.response_option
+        
+        return best_response
+    
+    
+    def communicate(self, environment) -> str:
+        """
+        The main execution loop: sense → interpret → project → remember → respond
+        Each step feeds into the next like a propagating wave.
+        """
+        # WAVE 1: Import sensory reality
+        sensory_inputs = self.import_sensory_inputs(environment)
+        
+        # WAVE 2: Synthesize emotional state of other person
+        their_emotions = self.synthesize_emotions(sensory_inputs)
+        
+        # WAVE 3: Generate response candidates
+        response_candidates = self._generate_response_options(
+            their_emotions=their_emotions,
+            context=environment.get_conversation_context()
+        )
+        
+        # WAVE 4: Project futures for each response
+        projected_futures = self.project_futures(their_emotions, response_candidates)
+        
+        # WAVE 5: Query memory for relevant patterns
+        current_context = {
+            'emotions': their_emotions,
+            'environment': environment.get_context_snapshot(),
+            'history': environment.get_conversation_history(),
+        }
+        relevant_memories = self.query_memory(current_context)
+        
+        # WAVE 6: Optimize and select response
+        optimal_response = self.optimize_response(
+            their_emotions,
+            projected_futures,
+            relevant_memories
+        )
+        
+        # WAVE 7: Execute and store outcome for learning
+        self._record_to_memory(current_context, optimal_response)
+        
+        return optimal_response
+    
+    
+    # ============ HELPER METHODS (Implementation details) ============
+    
+    def _cross_modal_fusion(self, inputs: List[SensoryInput]) -> Dict:
+        """Combine multiple sensory channels into unified signal"""
+        pass  # Implementation: weighted fusion based on channel reliability
+    
+    def _compute_anger_likelihood(self, signal: Dict) -> Tuple[float, float, List]:
+        """Map integrated signal to anger probability"""
+        pass  # Implementation: pattern matching for anger indicators
+    
+    def _compute_fear_likelihood(self, signal: Dict) -> Tuple[float, float, List]:
+        pass
+    
+    def _compute_joy_likelihood(self, signal: Dict) -> Tuple[float, float, List]:
+        pass
+    
+    def _compute_sadness_likelihood(self, signal: Dict) -> Tuple[float, float, List]:
+        pass
+    
+    def _compute_disgust_likelihood(self, signal: Dict) -> Tuple[float, float, List]:
+        pass
+    
+    def _compute_surprise_likelihood(self, signal: Dict) -> Tuple[float, float, List]:
+        pass
+    
+    def _compute_trust_likelihood(self, signal: Dict) -> Tuple[float, float, List]:
+        pass
+    
+    def _detecting_ambivalence(self, emotions: List[SyntheticEmotion]) -> bool:
+        """Check if conflicting emotions are present simultaneously"""
+        pass
+    
+    def _synthesize_ambivalence(self, emotions: List[SyntheticEmotion]) -> SyntheticEmotion:
+        """Create composite emotion for mixed states"""
+        pass
+    
+    def _predict_emotional_impact(self, current_state, proposed_response) -> float:
+        """Simulate how response will shift emotional state"""
+        pass
+    
+    def _estimate_conflict_probability(self, current_emotions, response, emotional_delta) -> float:
+        """Calculate likelihood of disagreement/conflict"""
+        pass
+    
+    def _calculate_reproductive_fitness(self, emotional_connection_change, 
+                                       conflict_risk, response_authenticity) -> float:
+        """Combined metric: emotional bonding + biological fitness"""
+        pass
+    
+    def _measure_authenticity(self, response: str) -> float:
+        """How genuine vs. calculated does this response feel?"""
+        pass
+    
+    def _compress_context_to_signature(self, context: Dict) -> str:
+        """Create searchable representation of situation"""
+        pass
+    
+    def _calculate_context_similarity(self, sig1: str, sig2: str) -> float:
+        """How similar are two situations?"""
+        pass
+    
+    def _generate_response_options(self, their_emotions, context) -> List[str]:
+        """Create candidate responses based on emotional state"""
+        pass
+    
+    def _evaluate_against_memories(self, response: str, memories: List[PastEvent]) -> float:
+        """Score response based on past outcomes"""
+        pass
+    
+    def _record_to_memory(self, context: Dict, response: str):
+        """Store this interaction for future learning"""
+        pass
+
+
+# ============ USAGE EXAMPLE ============
+
+def real_time_conversation():
+    """
+    How you'd actually use this in practice
+    """
+    optimizer = InsensitiveAssholeOptimizer()
+    environment = ConversationEnvironment()  # Your sensory interface
+    
+    while environment.conversation_active():
+        # They say/do something
+        environment.wait_for_their_turn()
+        
+        # You process and respond
+        your_response = optimizer.communicate(environment)
+        
+        # Execute response
+        environment.speak(your_response)
+        
+        # Learn from outcome
+        outcome_quality = environment.assess_outcome()
+        optimizer.update_learning(outcome_quality)
+
+
+if __name__ == "__main__":
+    """
+    The goal: stop being an insensitive asshole by processing
+    what others feel → projecting consequences → remembering lessons
+    before you open your mouth.
+    """
+    real_time_conversation()
