@@ -1,0 +1,95 @@
+// Inventory management timeline: FUTURE -> PRESENT -> PAST
+
+function processPurchaseRequest(itemId, quantityRequested, supplierId):
+
+    //--------------------------------------------------
+    // FUTURE: Purchase Order (commitment to buy)
+    //--------------------------------------------------
+    po = new PurchaseOrder()
+    po.id              = generateId()
+    po.itemId          = itemId
+    po.quantity        = quantityRequested
+    po.supplierId      = supplierId
+    po.status          = "OPEN"
+    po.timeDesignation = "FUTURE"        // not fulfilled yet
+    po.createdAt       = now()
+
+    save(po)
+
+    // No inventory change yet (it’s only a planned purchase)
+    log("PO created (FUTURE): " + po.id)
+
+
+function receiveShipment(poId, quantityReceived):
+
+    po = getPurchaseOrder(poId)
+
+    //--------------------------------------------------
+    // PRESENT: Order/Delivery Receipt (goods just arrived)
+    //--------------------------------------------------
+    receipt = new OrderReceipt()
+    receipt.id              = generateId()
+    receipt.poId            = po.id
+    receipt.itemId          = po.itemId
+    receipt.quantity        = quantityReceived
+    receipt.receivedAt      = now()
+    receipt.timeDesignation = "PRESENT"  // real-time confirmation
+
+    save(receipt)
+
+    // Update inventory in real time
+    inventoryRecord = getInventoryRecord(receipt.itemId)
+    inventoryRecord.onHand = inventoryRecord.onHand + receipt.quantity
+    save(inventoryRecord)
+
+    // Update PO status
+    if receipt.quantity == po.quantity:
+        po.status = "FULFILLED"
+    else if receipt.quantity < po.quantity:
+        po.status = "PARTIALLY_FULFILLED"
+    else:
+        po.status = "OVER_RECEIVED"
+    po.timeDesignation = "PRESENT"       // fulfillment occurring now
+    save(po)
+
+    log("Receipt recorded (PRESENT) for PO: " + po.id)
+
+
+function recordInvoice(poId, invoiceAmount):
+
+    po = getPurchaseOrder(poId)
+    receiptList = getReceiptsForPO(poId)
+
+    //--------------------------------------------------
+    // PAST: Invoice (payment for completed event)
+    //--------------------------------------------------
+    // Validate that received quantity matches what is being invoiced
+    totalReceived = sum(receipt.quantity for receipt in receiptList)
+
+    invoice = new Invoice()
+    invoice.id              = generateId()
+    invoice.poId            = po.id
+    invoice.itemId          = po.itemId
+    invoice.quantity        = totalReceived
+    invoice.amount          = invoiceAmount
+    invoice.issuedAt        = now()
+    invoice.status          = "PENDING_PAYMENT"
+    invoice.timeDesignation = "PAST"     // references goods already delivered
+
+    save(invoice)
+
+    // Mark PO as closed if everything matches
+    if totalReceived == po.quantity:
+        po.status          = "CLOSED"
+        po.timeDesignation = "PAST"      // action fully in the past now
+        save(po)
+
+    log("Invoice recorded (PAST) for PO: " + po.id)
+
+
+// Example high-level flow
+function runInventoryWorkflow(itemId, qty, supplierId, qtyReceived, invoiceAmount):
+
+    poId = processPurchaseRequest(itemId, qty, supplierId)   // FUTURE
+    receiveShipment(poId, qtyReceived)                        // PRESENT
+    recordInvoice(poId, invoiceAmount)                        // PAST
