@@ -1,0 +1,39 @@
+function transformTeamworkToMetawork(input):
+    // Input: "TEAMWORK"
+    // Output: "METAWORK"
+    
+    word = input  // "TEAMWORK"
+    
+    // TEAMWORK: T, E, A, M, W, O, R, K
+    // METAWORK: M, E, T, A, W, O, R, K
+    
+    // Strategy: Move M to front, keep E, move T after E, rest stays same
+    
+    step1 = removeCharAt(word, 0)      // "EAMWORK" (removed T)
+    step2 = removeCharAt(step1, 2)     // "EAWORK" (removed M)
+    step3 = insertCharAt(step2, 0, 'M') // "MEAWORK" (M at start)
+    step4 = insertCharAt(step3, 2, 'T') // "METAWORK" (T after E)
+    
+    return step4
+
+// Alternative: Character swap approach
+function transformTeamworkToMetaworkV2(input):
+    letters = toArray(input)  // ['T','E','A','M','W','O','R','K']
+    
+    // Move letters to new positions:
+    // M (index 3) → index 0
+    // E (index 1) → index 1 (stays)
+    // T (index 0) → index 2
+    // A (index 2) → index 3
+    
+    temp = letters[0]         // Store T
+    letters[0] = letters[3]   // M → position 0: ['M','E','A','M','W','O','R','K']
+    letters[3] = letters[2]   // A → position 3: ['M','E','A','A','W','O','R','K']
+    letters[2] = temp         // T → position 2: ['M','E','T','A','W','O','R','K']
+    
+    return toString(letters)  // "METAWORK"
+
+// Simplest approach: direct string construction
+function transformTeamworkToMetaworkV3(input):
+    return input[3] + input[1] + input[0] + input[2] + input[4:8]
+    // M + E + T + A + WORK = "METAWORK"
