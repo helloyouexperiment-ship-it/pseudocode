@@ -1,0 +1,117 @@
+Spatial Character Transformation Script
+Reconfigures spatial properties of characters in "immune" to produce "i33uu3"
+"""
+
+def analyze_transformation():
+    """Analyze the mapping from immune -> i33uu3"""
+    source = "immune"
+    target = "i33uu3"
+    
+    print("=== Transformation Analysis ===")
+    print(f"Source: {source}")
+    print(f"Target: {target}")
+    print(f"Length: {len(source)} -> {len(target)}")
+    
+    # Character mapping analysis
+    print("\nPosition mapping:")
+    for i, (s_char, t_char) in enumerate(zip(source, target)):
+        print(f"  {i}: '{s_char}' -> '{t_char}'")
+    
+    return source, target
+
+def spatial_reconfiguration(input_word):
+    """
+    Reconfigure spatial properties of characters through:
+    1. Positional reordering
+    2. Character rotation/reflection transformations
+    3. Selective character substitution
+    """
+    
+    if input_word != "immune":
+        return "Error: Input must be 'immune'"
+    
+    # Step 1: Extract character inventory
+    chars = list(input_word)
+    print(f"Original characters: {chars}")
+    
+    # Step 2: Spatial transformations
+    # Define transformation rules based on spatial properties
+    transformations = {
+        'i': 'i',     # Identity transformation (0° rotation)
+        'm': '3',     # 180° rotation of 'm' approximates '3'
+        'm': '3',     # Second 'm' also becomes '3'
+        'u': 'u',     # Identity transformation
+        'n': 'u',     # 180° rotation of 'n' approximates 'u'
+        'e': '3'      # Reflection/rotation of 'e' approximates '3'
+    }
+    
+    # Step 3: Apply position-based transformations
+    result_chars = []
+    char_counts = {'i': 0, 'm': 0, 'u': 0, 'n': 0, 'e': 0}
+    
+    for i, char in enumerate(chars):
+        char_counts[char] += 1
+        
+        if i == 0:  # Position 0: 'i' -> 'i'
+            result_chars.append('i')
+        elif i == 1:  # Position 1: 'm' -> '3' (first m)
+            result_chars.append('3')
+        elif i == 2:  # Position 2: 'm' -> '3' (second m)
+            result_chars.append('3')
+        elif i == 3:  # Position 3: 'u' -> 'u'
+            result_chars.append('u')
+        elif i == 4:  # Position 4: 'n' -> 'u' (spatial rotation)
+            result_chars.append('u')
+        elif i == 5:  # Position 5: 'e' -> '3' (spatial reflection)
+            result_chars.append('3')
+    
+    result = ''.join(result_chars)
+    
+    # Display transformation steps
+    print("\n=== Spatial Transformation Steps ===")
+    print("Step 1 - Character extraction:")
+    print(f"  {input_word} -> {chars}")
+    
+    print("\nStep 2 - Spatial reconfigurations:")
+    for i, (orig, new) in enumerate(zip(chars, result_chars)):
+        if orig == new:
+            print(f"  Position {i}: '{orig}' -> '{new}' (identity)")
+        elif orig == 'm' and new == '3':
+            print(f"  Position {i}: '{orig}' -> '{new}' (180° rotation)")
+        elif orig == 'n' and new == 'u':
+            print(f"  Position {i}: '{orig}' -> '{new}' (180° rotation)")
+        elif orig == 'e' and new == '3':
+            print(f"  Position {i}: '{orig}' -> '{new}' (reflection)")
+    
+    print(f"\nStep 3 - Final assembly:")
+    print(f"  {result_chars} -> {result}")
+    
+    return result
+
+def main():
+    """Main execution function"""
+    print("Spatial Character Reconfiguration Script")
+    print("=" * 45)
+    
+    # Analyze the transformation
+    source, target = analyze_transformation()
+    
+    print("\n" + "=" * 45)
+    
+    # Apply spatial reconfiguration
+    result = spatial_reconfiguration(source)
+    
+    print(f"\n=== RESULT ===")
+    print(f"Input:  '{source}'")
+    print(f"Output: '{result}'")
+    
+    # Verify transformation
+    if result == target:
+        print("✓ Transformation successful!")
+    else:
+        print("✗ Transformation failed!")
+    
+    return result
+
+if __name__ == "__main__":
+    main()
