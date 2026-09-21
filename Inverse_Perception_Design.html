@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inverse Perception Design: content that reads you back</title>
+<style>
+  :root{
+    --bg:#0b0e13; --panel:#12171f; --panel2:#171e29; --ink:#eef2f8; --muted:#94a2b6;
+    --line:#222d3c; --a:#5ad1c0; --b:#7aa2ff; --c:#ff8f6b; --d:#d4a8ff; --y:#f4d35e;
+    --red:#ff6b6b; --blue:#6b9bff;
+    --mono:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.65;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:0 24px}
+  /* hero */
+  .hero{min-height:88vh;display:flex;flex-direction:column;justify-content:center;padding:80px 0 60px;
+    background:radial-gradient(900px 520px at 78% 8%,rgba(122,162,255,.13),transparent 60%),
+               radial-gradient(760px 460px at 12% 86%,rgba(90,209,192,.10),transparent 60%)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.34em;text-transform:uppercase;color:var(--a);margin-bottom:26px}
+  h1{font-size:clamp(38px,7vw,76px);line-height:1.0;margin:0 0 26px;font-weight:800;letter-spacing:-.025em}
+  h1 em{font-style:normal;background:linear-gradient(100deg,var(--a),var(--b) 55%,var(--d));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .dek{font-size:clamp(18px,2.5vw,23px);color:#d3dcea;max-width:680px;font-weight:400}
+  .dek b{color:#fff;font-weight:600}
+  .heronote{margin-top:38px;font-family:var(--mono);font-size:12.5px;color:var(--muted);display:flex;gap:10px 26px;flex-wrap:wrap}
+  .heronote span b{color:var(--ink)}
+  /* sections */
+  section{padding:64px 0;border-top:1px solid var(--line)}
+  .tag{font-family:var(--mono);font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--c);margin-bottom:14px}
+  h2{font-size:clamp(27px,4vw,40px);line-height:1.08;margin:0 0 22px;font-weight:750;letter-spacing:-.02em}
+  h2 .q{color:var(--muted);font-weight:600}
+  p{font-size:17.5px;color:#cfd8e6;margin:0 0 18px}
+  p.big{font-size:20px;color:#e6ecf5}
+  .lede{font-size:21px;color:#eef2f8;max-width:720px}
+  strong,b{color:#fff}
+  .def{display:inline;border-bottom:1px dotted var(--a);color:#fff;font-weight:600}
+  /* two-col compare */
+  .vs{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:30px 0 6px}
+  @media(max-width:640px){.vs{grid-template-columns:1fr}}
+  .vs .box{border:1px solid var(--line);border-radius:16px;padding:24px}
+  .vs .viral{background:linear-gradient(180deg,rgba(255,107,107,.06),transparent)}
+  .vs .chiral{background:linear-gradient(180deg,rgba(90,209,192,.08),transparent)}
+  .vs h4{margin:0 0 12px;font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase}
+  .vs .viral h4{color:var(--red)} .vs .chiral h4{color:var(--a)}
+  .vs p{font-size:15.5px;margin:0}
+  /* steps */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:34px 0 6px;counter-reset:s}
+  @media(max-width:720px){.steps{grid-template-columns:1fr}}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px 22px;position:relative}
+  .step .n{font-family:var(--mono);font-size:13px;color:var(--b);font-weight:700;letter-spacing:.1em}
+  .step h3{font-size:19px;margin:10px 0 10px;letter-spacing:-.01em}
+  .step p{font-size:15px;color:#c3cdda;margin:0}
+  .step .bio{margin-top:14px;font-family:var(--mono);font-size:11.5px;color:var(--muted);border-top:1px dashed var(--line);padding-top:11px}
+  .step .bio b{color:var(--a)}
+  /* callout */
+  .callout{border-left:3px solid var(--d);padding:6px 0 6px 24px;margin:30px 0;font-size:22px;line-height:1.5;color:#fff;font-weight:500}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:30px 32px;margin:26px 0}
+  .panel h3{margin:0 0 12px;font-size:21px}
+  .small{font-size:14.5px;color:var(--muted)}
+  .chips{display:flex;flex-wrap:wrap;gap:9px;margin:20px 0 0}
+  .chip{font-family:var(--mono);font-size:12.5px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 12px;color:#d3dcea}
+  .chip b{color:var(--a)}
+  /* closing */
+  .close{padding:84px 0 96px;text-align:center;background:radial-gradient(700px 400px at 50% 30%,rgba(212,168,255,.10),transparent 60%)}
+  .close h2{font-size:clamp(28px,5vw,48px);max-width:760px;margin:0 auto 22px}
+  .close p{max-width:600px;margin:0 auto 8px;color:#d3dcea}
+  footer{border-top:1px solid var(--line);padding:30px 0 60px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .kix{color:var(--y)}
+  .sitenav{position:sticky;top:0;z-index:50;background:rgba(11,14,19,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .sitenav .navwrap{max-width:980px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .sitenav .brand{font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:var(--ink);text-decoration:none;font-weight:700}
+  .sitenav .navlinks{display:flex;gap:8px;flex-wrap:wrap}
+  .sitenav .navlinks a{font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:20px;padding:6px 13px}
+  .sitenav .navlinks a:hover{color:var(--a);border-color:var(--a)}
+  .sitenav .navlinks a.active{color:var(--ink);border-color:var(--muted)}
+  .cta{display:inline-flex;align-items:center;gap:10px;margin-top:30px;background:linear-gradient(100deg,var(--a),var(--b));color:#06131a;text-decoration:none;font-weight:700;font-size:16px;padding:14px 24px;border-radius:30px}
+  .cta:hover{filter:brightness(1.08)}
+</style>
+</head>
+<body>
+<nav class="sitenav"><div class="navwrap">
+  <a class="brand" href="Inverse_Perception_Design.html">◆ Hello You Experiment</a>
+  <div class="navlinks">
+    <a class="active" href="Inverse_Perception_Design.html">Overview</a>
+    <a href="HYE_Archive_Analysis.html">The Analysis</a>
+    <a href="HYE_Macro_Synthesis.html">The Synthesis</a>
+    <a href="HYE_Map.html">The Map</a>
+  </div>
+</div></nav>
+
+<div class="wrap">
+
+<!-- HERO -->
+<header class="hero">
+  <div class="eyebrow">Inverse Perception Design</div>
+  <h1>Most content is built to mean<br>one thing to everyone.<br><em>This means something different<br>to each person who reads it.</em></h1>
+  <p class="dek">A design practice for making artifacts that don't deliver a message, they <b>provoke a reading</b>. The same piece of writing unfolds into a different, coherent meaning depending on who, or what, is interpreting it. The interpretation is partly the artifact, and partly a mirror of the interpreter.</p>
+  <div class="heronote">
+    <span><b>Framework:</b> Inverse Perception Design</span>
+    <span><b>Style:</b> Sortish</span>
+    <span><b>Output:</b> Chiral content</span>
+  </div>
+</header>
+
+<!-- PREMISE -->
+<section>
+  <div class="tag">The premise</div>
+  <h2>Conventional media optimizes to be understood. <span class="q">This optimizes to be interpreted.</span></h2>
+  <p class="lede">Almost everything published online is engineered to collapse, to land the same clean, scannable point in every head as fast as possible. That's what "good communication" usually means: low friction, high agreement, one reading.</p>
+  <p>Inverse Perception Design does the opposite on purpose. Instead of removing ambiguity, it <b>engineers</b> it, building an artifact layered densely enough that no two interpreters can resolve it the same way. The friction isn't a flaw to be smoothed out. The friction is the product.</p>
+  <p>The result is a single artifact that behaves less like a statement and more like an instrument: play it through different people, different AI models, or the same person years apart, and it returns a different note every time, each one valid, none of them final.</p>
+</section>
+
+<!-- SORTISH -->
+<section>
+  <div class="tag">The writing style</div>
+  <h2>Sortish, writing that holds two true meanings at once</h2>
+  <p><span class="def">Sortish</span> is a deliberately multi-stable way of writing: every line is built to carry two or more coherent meanings simultaneously. It does this by stacking puns, shifting registers mid-sentence, layering cultural references, and letting the language run intentionally dense. A single phrase might be a chemistry term, a movie quote, and a confession at the same time, all three correct.</p>
+  <p>The name comes from sorting. Faced with a Sortish text, an interpreter can't hold every pun, metaphor and reference at once, so they have to <b>sort</b>, prioritizing a few threads and setting the rest aside to build something coherent. That sorting is the whole point: <b>what an interpreter keeps, and what it drops, is a readout of how it weights meaning.</b></p>
+
+  <div class="panel">
+    <h3>Why it produces different readings</h3>
+    <p class="small" style="margin-bottom:14px">It's tempting to say a dense text "overloads" the reader. The truer mechanism is subtler, and it's worth getting right.</p>
+    <p>A Sortish artifact is <b>under-determined</b>: it genuinely supports many coherent parses, and it's presented with no instructions on which one is "right." So every interpreter resolves it by projecting it onto what they already know, their references, their assumptions, their context. That projection is lossy and personal by nature, which is exactly why the output varies.</p>
+    <p style="margin-bottom:0">The variation lands differently for people and machines, and that's a feature. A <b>human</b> sorts under the hard limit of working memory, they can only hold a handful of threads, so they grab the ones that resonate. A <b>language model</b> isn't short on capacity; instead, given a vague prompt, it slides the ambiguity toward the most statistically common meaning it learned in training. Two different sorting mechanisms, one diagnostic, which makes Sortish a way to measure not just <i>a</i> reading, but <i>how a given mind reads</i>.</p>
+  </div>
+
+  <p class="small">Sortish is the foundational mechanism of Inverse Perception Design, the technique that makes the rest of it work.</p>
+</section>
+
+<!-- THE PROCESS -->
+<section>
+  <div class="tag">How an artifact is made</div>
+  <h2>From a single thought to a dormant artifact</h2>
+  <p>The method borrows its vocabulary from genetics, and the analogy is exact. A finished post is a <span class="def">genotype</span>, compact, fixed code that stays dormant until something decompresses it into a <span class="def">phenotype</span>: a living interpretation, shaped as much by the interpreter's environment as by the code itself.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="n">01 · CAPTURE</div>
+      <h3>Write it raw</h3>
+      <p>No research, no outline. The trigger is simply a thought, a pivot, or a feeling worth recording. It opens with a small anchor, a project tag, and then fractures into multiple voices that drift across unrelated disciplines, meaning mutating line by line. Then it's compressed: emoji and a single loaded GIF pack the sprawl into shorthand. Posting timestamps it. Nothing is edited afterward.</p>
+      <div class="bio"><b>Three anchors:</b> every artifact holds a cognitive thread, an emotional charge, and a cultural moment, carried by text, emoji, and image.</div>
+    </div>
+    <div class="step">
+      <div class="n">02 · REFLECT</div>
+      <h3>Catch the wild type</h3>
+      <p>The locked artifact is run once through a fresh, un-primed AI with a minimal prompt. The model isn't taught anything; it's used as a mirror ground to the shape of the crowd. Its reading is the <b>"wild type"</b>, the most common interpretation a consensus would reach, and the gap between that and the original intent measures how far the thought sits from the center.</p>
+      <div class="bio"><b>Read once, then released.</b> Dwelling on the machine's reading would quietly bend future thinking toward it, the one outcome the method is designed to avoid.</div>
+    </div>
+    <div class="step">
+      <div class="n">03 · UNWIND</div>
+      <h3>Let the reader complete it</h3>
+      <p>The artifact sits in public like a tightly wound spool. Most people scroll past, and that's expected. But an engaged reader, decoding it through their own lens (increasingly, with their own AI), unwinds it into a meaning shaped by <i>their</i> beliefs and history. The same source unpacks into a bespoke reading for everyone who does the work.</p>
+      <div class="bio"><b>The vision:</b> as personal AI interpreters become common, every dense artifact becomes a key that opens differently in every hand.</div>
+    </div>
+  </div>
+</section>
+
+<!-- WILD TYPE EXPLAINER -->
+<section>
+  <div class="tag">A term worth knowing</div>
+  <h2>The "wild type" <span class="q">, the crowd's default reading</span></h2>
+  <p>In biology, the <b>wild type</b> is the most common version of a trait in a population, the baseline everything else is measured against. A large language model, trained on the statistical center of human writing, is effectively a wild-type machine: ask it an open question and it tends to return the most consensus-shaped answer.</p>
+  <p>That makes it the perfect instrument here. Bouncing a deliberately idiosyncratic artifact off a consensus engine doesn't reveal "the answer". It reveals the <b>distance</b> between one mind and the middle of the distribution. The reading you get back is less a translation than a measurement.</p>
+</section>
+
+<!-- DIAGRAM -->
+<section>
+  <div class="tag">The whole movement, in one picture</div>
+  <h2>The translation loop</h2>
+  <p>A raw thought starts as a <b>question</b> at one edge and an <b>answer</b> at the other, two states of the same mind that can't quite reach each other directly. The artifact carries the thought up to the consensus interpreter at the peak (the wild type), refracts back down into a reading, and is absorbed back toward the start to begin again. The arrows move because the process never really stops.</p>
+  <figure style="margin:30px 0 6px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px 18px 12px">
+    <figcaption style="text-align:center;font-weight:750;font-size:clamp(17px,2.5vw,25px);letter-spacing:-.01em;margin-bottom:4px;color:#fff">Translation of Cognition <span style="color:var(--muted);font-weight:600">Between Mental States of Self</span></figcaption>
+    <p style="text-align:center;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.14em;margin:0 0 8px">RAW COGNITION → CONSENSUS-READABLE OUTPUT → BACK</p>
+    <svg viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+      <style>
+        .flow{stroke-dasharray:14 18;stroke-linecap:round;animation:flowmove 4s linear infinite}
+        @keyframes flowmove{to{stroke-dashoffset:-96}}
+        .aip{animation:aip 3.2s ease-in-out infinite}
+        @keyframes aip{0%,100%{opacity:.95}50%{opacity:.5}}
+        @media (prefers-reduced-motion: reduce){.flow{animation:none}.aip{animation:none}}
+      </style>
+      <defs>
+        <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse"><path d="M34 0H0V34" fill="none" stroke="#ffffff" stroke-opacity=".045"/></pattern>
+        <marker id="aT" markerWidth="9" markerHeight="9" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#5ad1c0"/></marker>
+        <marker id="aR" markerWidth="9" markerHeight="9" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#ff8f6b"/></marker>
+        <marker id="aA" markerWidth="9" markerHeight="9" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#d4a8ff"/></marker>
+      </defs>
+      <rect x="90" y="120" width="865" height="400" fill="url(#grid)"/>
+      <line x1="90" y1="116" x2="90" y2="520" stroke="#2a3645" stroke-width="2"/>
+      <line x1="90" y1="520" x2="958" y2="520" stroke="#2a3645" stroke-width="2"/>
+      <line x1="520" y1="156" x2="520" y2="520" stroke="#2a3645" stroke-width="1.5" stroke-dasharray="3 8"/>
+      <path d="M110,511.2 L130,507.4 L150,502.3 L170,495.7 L190,487.1 L210,476.3 L230,462.9 L250,446.8 L270,427.7 L290,405.8 L310,381.1 L330,354.1 L350,325.3 L370,295.6 L390,265.8 L410,237.2 L430,211.0 L450,188.2 L470,170.0 L490,157.3 L510,150.8 L530,150.8 L550,157.3 L570,170.0 L590,188.2 L610,211.0 L630,237.2 L650,265.8 L670,295.6 L690,325.3 L710,354.1 L730,381.1 L750,405.8 L770,427.7 L790,446.8 L810,462.9 L830,476.3 L850,487.1 L870,495.7 L890,502.3 L910,507.4 L930,511.2" fill="none" stroke="#8a98ad" stroke-opacity=".5" stroke-width="2.5"/>
+      <line x1="150" y1="300" x2="792" y2="300" stroke="#c9d3e0" stroke-width="2" stroke-dasharray="2 10" stroke-linecap="round"/>
+      <text x="800" y="305" fill="#e8edf4" font-size="15" font-weight="700">Relevancy Threshold</text>
+      <line x1="123" y1="508" x2="498" y2="170" stroke="#5ad1c0" stroke-opacity=".22" stroke-width="2"/>
+      <line x1="542" y1="170" x2="908" y2="500" stroke="#ff8f6b" stroke-opacity=".22" stroke-width="2"/>
+      <line x1="912" y1="520" x2="140" y2="520" stroke="#d4a8ff" stroke-opacity=".22" stroke-width="2"/>
+      <line class="flow" x1="123" y1="508" x2="498" y2="170" stroke="#5ad1c0" stroke-width="3" marker-end="url(#aT)"/>
+      <line class="flow" x1="542" y1="170" x2="908" y2="500" stroke="#ff8f6b" stroke-width="3" marker-end="url(#aR)"/>
+      <line class="flow" x1="912" y1="520" x2="140" y2="520" stroke="#d4a8ff" stroke-width="3" marker-end="url(#aA)"/>
+      <text x="300" y="328" transform="rotate(-42 300 328)" text-anchor="middle" fill="#5ad1c0" font-family="ui-monospace,Menlo,monospace" font-size="14" letter-spacing="2">TRANSLATION PATH</text>
+      <text x="738" y="328" transform="rotate(42 738 328)" text-anchor="middle" fill="#ff8f6b" font-family="ui-monospace,Menlo,monospace" font-size="14" letter-spacing="2">REFRACTION PATH</text>
+      <text x="520" y="505" text-anchor="middle" fill="#d4a8ff" font-family="ui-monospace,Menlo,monospace" font-size="14" letter-spacing="2">ABSORPTION PATH</text>
+      <circle cx="110" cy="520" r="16" fill="#ff6b6b"/><text x="110" y="525" text-anchor="middle" fill="#0b0e13" font-size="14" font-weight="700">1</text>
+      <circle cx="930" cy="520" r="16" fill="#6b9bff"/><text x="930" y="525" text-anchor="middle" fill="#0b0e13" font-size="14" font-weight="700">2</text>
+      <circle class="aip" cx="520" cy="150" r="24" fill="#12171f" stroke="#c08bff" stroke-width="4"/><text x="520" y="156" text-anchor="middle" fill="#d4a8ff" font-size="15" font-weight="800">AI</text>
+      <text x="358" y="118" text-anchor="middle" fill="#e8edf4" font-size="14" font-weight="700">Social 3rd</text>
+      <text x="358" y="136" text-anchor="middle" fill="#94a2b6" font-size="12">"Observer"</text>
+      <text x="690" y="118" text-anchor="middle" fill="#e8edf4" font-size="14" font-weight="700">Wild Type</text>
+      <text x="690" y="136" text-anchor="middle" fill="#94a2b6" font-size="12">"Most Common"</text>
+      <text x="110" y="552" text-anchor="middle" fill="#e8edf4" font-size="16" font-weight="700">Self 1</text>
+      <text x="110" y="572" text-anchor="middle" fill="#94a2b6" font-size="13">"Question"</text>
+      <text x="930" y="552" text-anchor="middle" fill="#e8edf4" font-size="16" font-weight="700">Self 2</text>
+      <text x="930" y="572" text-anchor="middle" fill="#94a2b6" font-size="13">"Answer"</text>
+      <text x="58" y="330" transform="rotate(-90 58 330)" text-anchor="middle" fill="#94a2b6" font-size="13" font-weight="600">Frequency</text>
+      <text x="524" y="592" text-anchor="middle" fill="#94a2b6" font-size="13">Journey from raw cognition to consensus-readable output</text>
+    </svg>
+  </figure>
+  <p class="small">Note: the AI at the peak is a <i>consensus-shaped</i> interpreter, the closer a reading sits to the top, the more "common" it is. The further a thought starts from center, the longer its translation path.</p>
+</section>
+
+<!-- CHIRAL VS VIRAL -->
+<section>
+  <div class="tag">The output</div>
+  <h2>Not viral. Chiral.</h2>
+  <p class="lede">Viral content is built to be copied, identical, frictionless, the same in every share. Chiral content is built to be <b>decoded</b>, and what comes out is never quite the same twice.</p>
+  <div class="vs">
+    <div class="box viral">
+      <h4>Viral</h4>
+      <p>Spreads fast and shallow. The meaning is fixed and travels intact, so sharing requires no work and leaves little behind. Optimized for reach. Identical in every hand.</p>
+    </div>
+    <div class="box chiral">
+      <h4>Chiral</h4>
+      <p>Spreads slow and deep. The meaning only exists once a reader unwinds it, so the artifact and the reading form an inseparable pair. Optimized for self-recognition. Different in every hand.</p>
+    </div>
+  </div>
+  <p style="margin-top:26px">The word is borrowed from chemistry. A <b>chiral</b> object, like your left and right hands, can't be laid perfectly over its own mirror image. Chiral content works the same way: a reading can't be separated from the reader who produced it, because the reading is partly <i>them</i>. You can't hand someone "the meaning" the way you forward a clip. They have to grow it themselves, and when they do, they find their own reflection in it.</p>
+  <div class="callout">A single source that generates a different, valid reality for everyone who looks at it, and shows each of them something about how they see.</div>
+</section>
+
+<!-- WHY IT MATTERS -->
+<section>
+  <div class="tag">Why it matters</div>
+  <h2>It turns a piece of content into a diagnostic</h2>
+  <p>Conventional media tries to push a fixed message into as many heads as possible. Inverse Perception Design flips the exchange: the artifact gives the interpreter almost nothing to agree with, and in the act of making sense of it, the interpreter reveals their own context, their references, their biases, the distance they're reading from.</p>
+  <p>Run the same artifact through ten people and ten models and the spread of readings becomes a map: of how different minds weight meaning, how different models default, and how the same text drifts as the culture around it moves. Each reading is a valid path through identical material. None is the correct one. That's not a bug in the medium. It's the entire instrument.</p>
+  <div class="chips">
+    <span class="chip"><b>For readers</b>, content you complete, not just consume</span>
+    <span class="chip"><b>For builders</b>, a probe for how a model interprets</span>
+    <span class="chip"><b>For the author</b>, a way to think in the open without flattening it</span>
+  </div>
+</section>
+
+</div>
+
+<!-- CLOSE -->
+<section class="close">
+  <div class="wrap">
+    <div class="tag" style="color:var(--d);justify-content:center">The Hello You Experiment</div>
+    <h2>Most things online are written to be understood. This is written to understand <span class="kix">you</span> back.</h2>
+    <p>Inverse Perception Design, Sortish, and chiral content are one idea seen from three sides: build the artifact dense enough, and meaning stops being something you send, and becomes something the world reveals about itself, one reader at a time.</p>
+    <a class="cta" href="HYE_Archive_Analysis.html">See it taken apart, the full breakdown &nbsp;→</a>
+  </div>
+</section>
+
+<div class="wrap">
+<footer>
+  Inverse Perception Design · Sortish · Chiral Content, an overview of the Hello You Experiment method.
+</footer>
+</div>
+
+</body>
+</html>
